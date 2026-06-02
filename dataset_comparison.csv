@@ -1,0 +1,6 @@
+Dataset,Size,Domain,Avg Source Length (words),Avg Target Length (words),Task Type,Best For
+CNN/DailyMail,~300K,News,~800,~55,Extractive/Abstractive,General summarization (our dataset)
+ArXiv,~215K,All Sciences,~4000,~250,Abstractive,Long scientific documents
+PubMed,~133K,Biomedical,~3000,~200,Abstractive,Biomedical domain
+XSum,~227K,News (BBC),~430,~23,Abstractive,Extreme summarization
+SamSum,~16K,Conversations,~150,~20,Abstractive,Dialogue summarization
