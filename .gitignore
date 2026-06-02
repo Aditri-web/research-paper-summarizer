@@ -1,0 +1,72 @@
+# Python
+venv/
+__pycache__/
+*.pyc
+.ipynb_checkpoints/
+*.egg-info/
+
+# Data
+data/raw/
+data/cache/
+*.csv
+*.json
+*.parquet
+
+# Models (large files)
+models/*.bin
+models/*.safetensors
+*.pth
+*.pt
+
+# Outputs
+outputs/
+wandb/
+results/
+
+# Environment
+.env
+.DS_Store
+kaggle.json
+
+# HuggingFace
+.huggingface/
+# Large data files
+data/cnn_dailymail_cached/
+data/data/arxiv.zip
+*.zip
+*.bin
+*.safetensors
+*.pt
+*.pth
+
+# Models
+models/*
+checkpoints/
+
+# Virtual environment
+venv/
+env/
+.venv/
+
+# Jupyter
+.ipynb_checkpoints/
+
+# Python
+__pycache__/
+*.pyc
+
+# OS
+.DS_Store
+
+# Secrets
+.env
+kaggle.json
+hf_token.txt
+# Arxiv data - HUGE files
+data/data/arxiv-metadata-oai-snapshot.json
+data/data/arxiv.zip
+data/data/*.json
+data/data/*.zip
+data/data/.ipynb_checkpoints/
+data/data/
+data/cnn_dailymail_cached/
