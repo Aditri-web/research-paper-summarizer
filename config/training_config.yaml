@@ -1,0 +1,79 @@
+# =============================================================================
+# Training Configuration — Mistral-7B QLoRA Summarizer
+# =============================================================================
+
+model:
+  name: "mistralai/Mistral-7B-Instruct-v0.3"
+  max_seq_length: 2048
+  load_in_4bit: true
+  dtype: null                    # auto-detect (bfloat16 on Ampere+, float16 otherwise)
+
+lora:
+  r: 16                          # LoRA rank
+  lora_alpha: 32                 # scaling = alpha / r = 2
+  lora_dropout: 0.05
+  bias: "none"
+  use_gradient_checkpointing: "unsloth"
+  target_modules:
+    - "q_proj"
+    - "k_proj"
+    - "v_proj"
+    - "o_proj"
+    - "gate_proj"
+    - "up_proj"
+    - "down_proj"
+
+data:
+  # HuggingFace dataset identifiers
+  arxiv_dataset: "ccdv/arxiv-summarization"
+  scitldr_dataset: "allenai/scitldr"
+  scitldr_config: "AIC"           # Abstract + Intro + Conclusion split
+
+  # Subset sizes (set to null to use full dataset)
+  arxiv_train_size: 10000
+  arxiv_val_size: 1000
+  arxiv_test_size: 1000
+
+  # SciTLDR is small (~3k total), so we use all of it
+  scitldr_use_full: true
+
+  processed_dir: "data/processed"
+  seed: 42
+
+  # Instruction template (Mistral chat format)
+  prompt_template: |
+    [INST] You are a scientific paper summarizer. Write a concise, accurate summary of the following research paper.
+
+    Paper:
+    {source}
+
+    [/INST] Summary: {target}
+
+training:
+  output_dir: "models/mistral7b-summarizer-qlora"
+  num_train_epochs: 3
+  per_device_train_batch_size: 2
+  per_device_eval_batch_size: 2
+  gradient_accumulation_steps: 4       # effective batch = 8
+  warmup_steps: 100
+  learning_rate: 2.0e-4
+  weight_decay: 0.01
+  lr_scheduler_type: "cosine"
+  optim: "adamw_8bit"                  # 8-bit Adam (Unsloth default)
+  fp16: false
+  bf16: true                           # set false if GPU doesn't support bf16
+  logging_steps: 25
+  eval_steps: 200
+  save_steps: 200
+  save_total_limit: 3
+  load_best_model_at_end: true
+  metric_for_best_model: "eval_loss"
+  greater_is_better: false
+  report_to: "none"                    # change to "wandb" to enable W&B logging
+  packing: true                        # sequence packing for efficiency
+  dataset_text_field: "text"
+
+hub:
+  push_to_hub: false
+  hub_model_id: ""                     # e.g. "your-username/mistral7b-research-summarizer"
+  hub_token_env: "HF_TOKEN"

@@ -1,0 +1,94 @@
+name: Lint & Format Check
+
+on:
+  push:
+    branches: [main, dev]
+  pull_request:
+    branches: [main]
+
+jobs:
+  lint:
+    name: Code Quality (black + isort)
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dev dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install black isort flake8
+
+      - name: Check formatting with Black
+        run: black --check --diff src/ deployment/
+
+      - name: Check import order with isort
+        run: isort --check-only --diff src/ deployment/
+
+      - name: Lint with flake8
+        run: |
+          flake8 src/ deployment/ \
+            --max-line-length=100 \
+            --extend-ignore=E203,W503,E501 \
+            --exclude=__pycache__,.git,venv
+
+  smoke-test:
+    name: Import Smoke Test
+    runs-on: ubuntu-latest
+    needs: lint
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install minimal deps
+        run: |
+          pip install -q pyyaml datasets transformers
+
+      - name: Test imports and dataset loader
+        run: |
+          python -c "
+          import yaml, sys
+          sys.path.insert(0, '.')
+          from src.data.preprocess import build_prompt, PROMPT_TEMPLATE, INFERENCE_TEMPLATE
+          
+          # Test prompt building
+          prompt = build_prompt('This is a test paper.', 'A test summary.')
+          assert '[INST]' in prompt, 'Missing [INST] tag'
+          assert 'This is a test paper.' in prompt
+          assert 'A test summary.' in prompt
+          
+          inf_prompt = build_prompt('Test paper.', inference=True)
+          assert 'Test paper.' in inf_prompt
+          assert 'A test summary.' not in inf_prompt
+          
+          print('✅ All smoke tests passed!')
+          "
+
+      - name: Dry-run evaluation (no model)
+        run: |
+          python -c "
+          import yaml, json, os
+          os.makedirs('results', exist_ok=True)
+          with open('config/eval_config.yaml') as f:
+              config = yaml.safe_load(f)
+          # Override for CI (no GPU, no model)
+          config['metrics']['bertscore']['device'] = 'cpu'
+          config['metrics']['alignscore']['enabled'] = False
+          
+          from src.evaluation.evaluate import evaluate
+          results = evaluate(config, dry_run=True)
+          assert 'rougeL' in results, 'Missing rougeL'
+          print('✅ Dry-run evaluation passed! ROUGE-L:', results['rougeL'])
+          "

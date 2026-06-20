@@ -1,0 +1,48 @@
+# =============================================================================
+# Evaluation Configuration — Mistral-7B QLoRA Summarizer
+# =============================================================================
+
+model:
+  # Path to trained adapter (relative to project root)
+  adapter_path: "models/mistral7b-summarizer-qlora"
+  base_model: "mistralai/Mistral-7B-Instruct-v0.3"
+  load_in_4bit: true
+  max_new_tokens: 256
+  temperature: 0.1
+  do_sample: false
+  repetition_penalty: 1.1
+
+data:
+  # Which split to evaluate on
+  test_split: "test"
+  processed_dir: "data/processed"
+  # Max samples to evaluate (null = all)
+  max_eval_samples: 500
+  batch_size: 8
+
+metrics:
+  rouge:
+    enabled: true
+    variants: ["rouge1", "rouge2", "rougeL", "rougeLsum"]
+    use_stemmer: true
+
+  bertscore:
+    enabled: true
+    model_type: "microsoft/deberta-xlarge-mnli"
+    lang: "en"
+    batch_size: 16
+    device: "cuda"               # set to "cpu" or "mps" as needed
+
+  alignscore:
+    enabled: true
+    # Checkpoint downloaded automatically on first run (~500 MB)
+    ckpt_path: "alignscore_ckpt/AlignScore-large.ckpt"
+    evaluation_mode: "nli_sp"   # options: nli, nli_sp, bin, bin_sp
+    batch_size: 8
+    device: "cuda"
+
+output:
+  results_dir: "results"
+  predictions_file: "results/predictions.jsonl"
+  metrics_file: "results/eval_results.json"
+  report_file: "results/eval_report.md"

@@ -1,72 +1,82 @@
+# =============================================================================
+# .gitignore — Research Paper Summarizer
+# =============================================================================
+
 # Python
-venv/
-__pycache__/
-*.pyc
-.ipynb_checkpoints/
-*.egg-info/
-
-# Data
-data/raw/
-data/cache/
-*.csv
-*.json
-*.parquet
-
-# Models (large files)
-models/*.bin
-models/*.safetensors
-*.pth
-*.pt
-
-# Outputs
-outputs/
-wandb/
-results/
-
-# Environment
-.env
-.DS_Store
-kaggle.json
-
-# HuggingFace
-.huggingface/
-# Large data files
-data/cnn_dailymail_cached/
-data/data/arxiv.zip
-*.zip
-*.bin
-*.safetensors
-*.pt
-*.pth
-
-# Models
-models/*
-checkpoints/
-
-# Virtual environment
 venv/
 env/
 .venv/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.egg-info/
+dist/
+build/
+*.egg
 
 # Jupyter
 .ipynb_checkpoints/
 
-# Python
-__pycache__/
-*.pyc
-
 # OS
 .DS_Store
+Thumbs.db
 
-# Secrets
+# Secrets & credentials
 .env
 kaggle.json
 hf_token.txt
-# Arxiv data - HUGE files
+*.key
+
+# --- Large model files (never commit these) ---
+models/
+*.bin
+*.safetensors
+*.pt
+*.pth
+*.gguf
+*.ggml
+
+# LoRA adapter files (tracked separately via HF Hub)
+adapter_model.bin
+adapter_model.safetensors
+
+# --- Training outputs ---
+outputs/
+wandb/
+runs/
+checkpoints/
+results/
+*.log
+
+# --- AlignScore checkpoint (large) ---
+alignscore_ckpt/
+
+# --- Data (large files, use HF Hub instead) ---
+data/raw/
+data/cache/
+data/processed/
+data/cnn_dailymail_cached/
+data/data/
+
+# Specific large files
 data/data/arxiv-metadata-oai-snapshot.json
 data/data/arxiv.zip
 data/data/*.json
 data/data/*.zip
-data/data/.ipynb_checkpoints/
-data/data/
-data/cnn_dailymail_cached/
+*.arrow
+*.parquet
+
+# --- Dataset cache ---
+~/.cache/huggingface/
+
+# Dev / IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Coverage
+.coverage
+htmlcov/
+.pytest_cache/
