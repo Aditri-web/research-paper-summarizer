@@ -11,11 +11,10 @@ Usage:
 from __future__ import annotations
 
 import logging
-import random
 from typing import Optional
 
 import yaml
-from datasets import DatasetDict, concatenate_datasets, load_dataset
+from datasets import concatenate_datasets, load_dataset
 
 logger = logging.getLogger(__name__)
 
@@ -23,6 +22,7 @@ logger = logging.getLogger(__name__)
 # ---------------------------------------------------------------------------
 # Helpers
 # ---------------------------------------------------------------------------
+
 
 def _sample_split(dataset_split, n: Optional[int], seed: int):
     """Return at most n examples from a split, shuffled."""
@@ -50,9 +50,7 @@ def _load_arxiv(config: dict, seed: int):
     val = _sample_split(ds["validation"], config["data"]["arxiv_val_size"], seed)
     test = _sample_split(ds["test"], config["data"]["arxiv_test_size"], seed)
 
-    logger.info(
-        f"  ArXiv → train: {len(train):,}  val: {len(val):,}  test: {len(test):,}"
-    )
+    logger.info(f"  ArXiv → train: {len(train):,}  val: {len(val):,}  test: {len(test):,}")
     return train, val, test
 
 
@@ -85,15 +83,14 @@ def _load_scitldr(config: dict, seed: int):
     val = ds["validation"].shuffle(seed=seed)
     test = ds["test"].shuffle(seed=seed)
 
-    logger.info(
-        f"  SciTLDR → train: {len(train):,}  val: {len(val):,}  test: {len(test):,}"
-    )
+    logger.info(f"  SciTLDR → train: {len(train):,}  val: {len(val):,}  test: {len(test):,}")
     return train, val, test
 
 
 # ---------------------------------------------------------------------------
 # Public API
 # ---------------------------------------------------------------------------
+
 
 def load_datasets(config: dict) -> tuple:
     """

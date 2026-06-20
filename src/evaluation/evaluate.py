@@ -17,7 +17,6 @@ import argparse
 import json
 import logging
 import os
-from pathlib import Path
 from typing import Optional
 
 import yaml
@@ -34,13 +33,12 @@ logger = logging.getLogger(__name__)
 # Individual metric computers
 # ---------------------------------------------------------------------------
 
+
 def compute_rouge(predictions: list[str], references: list[str]) -> dict:
     """Compute ROUGE-1, ROUGE-2, ROUGE-L, ROUGE-Lsum."""
     from rouge_score import rouge_scorer
 
-    scorer = rouge_scorer.RougeScorer(
-        ["rouge1", "rouge2", "rougeL", "rougeLsum"], use_stemmer=True
-    )
+    scorer = rouge_scorer.RougeScorer(["rouge1", "rouge2", "rougeL", "rougeLsum"], use_stemmer=True)
     agg = {"rouge1": [], "rouge2": [], "rougeL": [], "rougeLsum": []}
     for pred, ref in zip(predictions, references):
         scores = scorer.score(ref, pred)
@@ -128,9 +126,7 @@ def _download_alignscore_ckpt(ckpt_path: str) -> None:
     """Download the AlignScore-large checkpoint from HuggingFace."""
     import urllib.request
 
-    ALIGNSCORE_URL = (
-        "https://huggingface.co/yzha/AlignScore/resolve/main/AlignScore-large.ckpt"
-    )
+    ALIGNSCORE_URL = "https://huggingface.co/yzha/AlignScore/resolve/main/AlignScore-large.ckpt"
     os.makedirs(os.path.dirname(ckpt_path), exist_ok=True)
     logger.info(f"  Downloading AlignScore-large checkpoint to {ckpt_path} …")
     urllib.request.urlretrieve(ALIGNSCORE_URL, ckpt_path)
@@ -140,6 +136,7 @@ def _download_alignscore_ckpt(ckpt_path: str) -> None:
 # ---------------------------------------------------------------------------
 # Report generator
 # ---------------------------------------------------------------------------
+
 
 def _write_markdown_report(results: dict, output_path: str) -> None:
     """Write a clean markdown evaluation report."""
@@ -177,6 +174,7 @@ def _write_markdown_report(results: dict, output_path: str) -> None:
 # ---------------------------------------------------------------------------
 # Main evaluation runner
 # ---------------------------------------------------------------------------
+
 
 def evaluate(
     config: dict,
@@ -251,8 +249,11 @@ def evaluate(
         # Lightweight BERTScore run for dry-run (use small model)
         logger.info("📊 Computing BERTScore (dry-run, small model) …")
         bertscore_scores = compute_bertscore(
-            predictions, references, model_type="distilbert-base-uncased",
-            batch_size=2, device="cpu"
+            predictions,
+            references,
+            model_type="distilbert-base-uncased",
+            batch_size=2,
+            device="cpu",
         )
         results.update(bertscore_scores)
 
@@ -302,7 +303,9 @@ def evaluate(
 
 
 def main():
-    parser = argparse.ArgumentParser(description="Evaluate summarizer with ROUGE-L, BERTScore, AlignScore")
+    parser = argparse.ArgumentParser(
+        description="Evaluate summarizer with ROUGE-L, BERTScore, AlignScore"
+    )
     parser.add_argument("--config", default="config/eval_config.yaml")
     parser.add_argument("--predictions", default=None, help="Path to predictions JSONL")
     parser.add_argument(

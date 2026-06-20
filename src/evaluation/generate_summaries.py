@@ -16,7 +16,6 @@ import argparse
 import json
 import logging
 import os
-import sys
 from typing import Optional
 
 import yaml
@@ -54,9 +53,8 @@ def load_model_and_tokenizer(config: dict):
 
     except ImportError:
         logger.warning("Unsloth not available — falling back to PEFT + transformers.")
-        from transformers import AutoModelForCausalLM, AutoTokenizer, BitsAndBytesConfig
         from peft import PeftModel
-        import torch
+        from transformers import AutoModelForCausalLM, AutoTokenizer, BitsAndBytesConfig
 
         bnb_config = BitsAndBytesConfig(load_in_4bit=True) if load_in_4bit else None
         base = AutoModelForCausalLM.from_pretrained(
@@ -116,6 +114,7 @@ def run_inference(config: dict, output_path: Optional[str] = None) -> list[dict]
     List of dicts with keys: source, reference, prediction
     """
     from datasets import load_from_disk
+
     from src.data.preprocess import INFERENCE_TEMPLATE
 
     output_path = output_path or config["output"]["predictions_file"]
@@ -140,12 +139,12 @@ def run_inference(config: dict, output_path: Optional[str] = None) -> list[dict]
     raw_processed_dir = processed_dir + "_raw"
     if os.path.isdir(raw_processed_dir):
         from datasets import load_from_disk as _lfd
+
         raw_test = _lfd(raw_processed_dir)["test"]
     else:
-        logger.info(
-            "Raw test split not found — rebuilding from HuggingFace Hub for references."
-        )
-        from src.data.dataset_loader import load_datasets, load_config
+        logger.info("Raw test split not found — rebuilding from HuggingFace Hub for references.")
+        from src.data.dataset_loader import load_config, load_datasets
+
         train_cfg = load_config()
         _, _, raw_test = load_datasets(train_cfg)
 
@@ -159,7 +158,7 @@ def run_inference(config: dict, output_path: Optional[str] = None) -> list[dict]
     batch_size = config["data"].get("batch_size", 8)
     results = []
     for i in tqdm(range(0, len(raw_test), batch_size), desc="Generating"):
-        batch = raw_test[i: i + batch_size]
+        batch = raw_test[i : i + batch_size]
         sources = batch["source"]
         references = batch["target"]
 

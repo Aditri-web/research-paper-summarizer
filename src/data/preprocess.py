@@ -56,6 +56,7 @@ def build_prompt(source: str, target: str = "", inference: bool = False) -> str:
 # Dataset tokenization
 # ---------------------------------------------------------------------------
 
+
 def tokenize_dataset(
     dataset: Dataset,
     tokenizer,
@@ -80,8 +81,6 @@ def tokenize_dataset(
     -------
     datasets.Dataset with a 'text' column (formatted prompt strings).
     """
-    max_seq_length = config["model"].get("max_seq_length", 2048)
-
     def format_example(batch):
         texts = []
         for src, tgt in zip(batch["source"], batch["target"]):

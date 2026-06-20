@@ -17,10 +17,10 @@ import logging
 import os
 import sys
 
+import gradio as gr
+
 # Add project root to path when running from deployment/
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
-
-import gradio as gr
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -28,9 +28,7 @@ logger = logging.getLogger(__name__)
 # ---------------------------------------------------------------------------
 # Config
 # ---------------------------------------------------------------------------
-ADAPTER_PATH = os.environ.get(
-    "ADAPTER_PATH", "models/mistral7b-summarizer-qlora"
-)
+ADAPTER_PATH = os.environ.get("ADAPTER_PATH", "models/mistral7b-summarizer-qlora")
 LOAD_IN_4BIT = os.environ.get("LOAD_IN_4BIT", "true").lower() == "true"
 MAX_NEW_TOKENS = int(os.environ.get("MAX_NEW_TOKENS", "256"))
 
@@ -91,9 +89,8 @@ def _get_model():
             FastLanguageModel.for_inference(_model)
         except (ImportError, Exception) as e:
             logger.warning(f"Unsloth load failed ({e}) — using PEFT fallback.")
-            from transformers import AutoModelForCausalLM, AutoTokenizer, BitsAndBytesConfig
             from peft import PeftModel
-            import torch
+            from transformers import AutoModelForCausalLM, AutoTokenizer, BitsAndBytesConfig
 
             bnb = BitsAndBytesConfig(load_in_4bit=True) if LOAD_IN_4BIT else None
             base = AutoModelForCausalLM.from_pretrained(
@@ -114,6 +111,7 @@ def _get_model():
 # Inference function
 # ---------------------------------------------------------------------------
 
+
 def generate_summary(text: str, max_tokens: int, temperature: float) -> tuple[str, str]:
     """
     Generate summary and compute ROUGE-L vs. (optional) reference.
@@ -123,6 +121,7 @@ def generate_summary(text: str, max_tokens: int, temperature: float) -> tuple[st
         return "", "⚠️ Please enter some paper text."
 
     import torch
+
     from src.data.preprocess import INFERENCE_TEMPLATE
 
     prompt = INFERENCE_TEMPLATE.format(source=text.strip())
@@ -197,16 +196,14 @@ with gr.Blocks(
 ) as demo:
 
     # --- Header ---
-    gr.HTML(
-        """
+    gr.HTML("""
         <div class="title-block">
           <h1>📄 Research Paper Summarizer</h1>
           <p style="color:#6366f1;font-size:1.05rem;">
             Mistral-7B-Instruct · QLoRA · Fine-tuned on ArXiv + SciTLDR
           </p>
         </div>
-        """
-    )
+        """)
 
     # --- Main tab ---
     with gr.Tab("✨ Summarize"):
@@ -220,11 +217,17 @@ with gr.Blocks(
                 )
                 with gr.Row():
                     max_tokens_slider = gr.Slider(
-                        64, 512, value=256, step=32,
+                        64,
+                        512,
+                        value=256,
+                        step=32,
                         label="Max Summary Tokens",
                     )
                     temperature_slider = gr.Slider(
-                        0.0, 1.0, value=0.1, step=0.05,
+                        0.0,
+                        1.0,
+                        value=0.1,
+                        step=0.05,
                         label="Temperature",
                     )
                 summarize_btn = gr.Button("🔍 Summarize", variant="primary", size="lg")
@@ -253,9 +256,7 @@ with gr.Blocks(
 
     # --- Evaluation tab ---
     with gr.Tab("📊 Evaluate vs. Reference"):
-        gr.Markdown(
-            "Paste a generated summary and your reference summary to compute ROUGE-L."
-        )
+        gr.Markdown("Paste a generated summary and your reference summary to compute ROUGE-L.")
         with gr.Row():
             eval_summary = gr.Textbox(label="Generated Summary", lines=6)
             eval_reference = gr.Textbox(label="Reference Summary", lines=6)
@@ -270,8 +271,7 @@ with gr.Blocks(
 
     # --- About tab ---
     with gr.Tab("ℹ️ About"):
-        gr.Markdown(
-            """
+        gr.Markdown("""
 ## About This Model
 
 | | |
@@ -297,8 +297,7 @@ If you use this project, please cite:
   url    = {https://github.com/your-username/research-paper-summarizer}
 }
 ```
-            """
-        )
+            """)
 
 # ---------------------------------------------------------------------------
 # Launch

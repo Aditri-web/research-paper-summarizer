@@ -20,7 +20,6 @@ from __future__ import annotations
 import argparse
 import logging
 import sys
-from typing import Optional
 
 logging.basicConfig(
     level=logging.INFO,
@@ -33,6 +32,7 @@ logger = logging.getLogger(__name__)
 # ---------------------------------------------------------------------------
 # Model loader
 # ---------------------------------------------------------------------------
+
 
 def load_model(
     adapter_path: str = "models/mistral7b-summarizer-qlora",
@@ -57,9 +57,8 @@ def load_model(
 
     except ImportError:
         logger.warning("Unsloth not available — using standard PEFT.")
-        from transformers import AutoModelForCausalLM, AutoTokenizer, BitsAndBytesConfig
         from peft import PeftModel
-        import torch
+        from transformers import AutoModelForCausalLM, AutoTokenizer, BitsAndBytesConfig
 
         base_name = "mistralai/Mistral-7B-Instruct-v0.3"
         bnb_config = BitsAndBytesConfig(load_in_4bit=True) if load_in_4bit else None
@@ -81,6 +80,7 @@ def load_model(
 # ---------------------------------------------------------------------------
 # Inference
 # ---------------------------------------------------------------------------
+
 
 def summarize(
     text: str,
@@ -104,6 +104,7 @@ def summarize(
     str : Generated summary.
     """
     import torch
+
     from src.data.preprocess import INFERENCE_TEMPLATE
 
     prompt = INFERENCE_TEMPLATE.format(source=text.strip())
@@ -132,6 +133,7 @@ def summarize(
 # ---------------------------------------------------------------------------
 # CLI entry point
 # ---------------------------------------------------------------------------
+
 
 def main():
     parser = argparse.ArgumentParser(

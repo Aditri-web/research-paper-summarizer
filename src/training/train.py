@@ -59,16 +59,16 @@ def train(config: dict) -> None:
     _check_unsloth()
 
     # --- Imports (deferred so import errors are clear) ---
-    from unsloth import FastLanguageModel
-    from trl import SFTTrainer
     from transformers import TrainingArguments
-    from datasets import load_from_disk
+    from trl import SFTTrainer
+    from unsloth import FastLanguageModel
 
     # --- 1. Load or build processed dataset ---
     processed_dir = config["data"]["processed_dir"]
     if os.path.isdir(processed_dir):
         logger.info(f"Loading processed dataset from {processed_dir} …")
         from datasets import load_from_disk as _lfd
+
         processed = _lfd(processed_dir)
         train_ds = processed["train"]
         val_ds = processed["validation"]
@@ -80,6 +80,7 @@ def train(config: dict) -> None:
         raw_train, raw_val, _ = load_datasets(config)
         # We need a tokenizer to format; load it first temporarily
         from transformers import AutoTokenizer
+
         tokenizer_tmp = AutoTokenizer.from_pretrained(
             config["model"]["name"], trust_remote_code=True
         )
