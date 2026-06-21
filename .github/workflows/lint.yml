@@ -51,11 +51,9 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: "3.11"
-
       - name: Install minimal deps
         run: |
-          pip install -q pyyaml datasets transformers
-
+          pip install -q pyyaml datasets transformers rouge-score bert-score
       - name: Test imports and dataset loader
         run: |
           python -c "
