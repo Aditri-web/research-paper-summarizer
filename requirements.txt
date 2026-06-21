@@ -48,3 +48,4 @@ matplotlib>=3.8.0
 seaborn>=0.13.0
 rouge_score
 rouge_score
+rouge_score
