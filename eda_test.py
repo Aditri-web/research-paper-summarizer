@@ -1,6 +1,6 @@
 import numpy as np
-from transformers import AutoTokenizer
 from datasets import load_dataset
+from transformers import AutoTokenizer
 
 print("Loading dataset...")
 dataset = load_dataset("abisee/cnn_dailymail", "3.0.0")
@@ -13,19 +13,19 @@ if tokenizer.pad_token is None:
     tokenizer.pad_token = tokenizer.eos_token
     tokenizer.pad_token_id = tokenizer.eos_token_id
 
-available_cols = dataset['train'].column_names
+available_cols = dataset["train"].column_names
 print("Available columns:", available_cols)
-if 'source' in available_cols:
-    src_col = 'source'
-    tgt_col = 'target'
-elif 'article' in available_cols:
-    src_col = 'article'
-    tgt_col = 'highlights'
+if "source" in available_cols:
+    src_col = "source"
+    tgt_col = "target"
+elif "article" in available_cols:
+    src_col = "article"
+    tgt_col = "highlights"
 else:
     raise ValueError(f"Could not find correct columns. Available: {available_cols}")
 
 sample_size = 5
-subset = dataset['train'].select(range(sample_size))
+subset = dataset["train"].select(range(sample_size))
 
 print("Testing tokenization...")
 for item in subset:
